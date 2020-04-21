@@ -15,20 +15,20 @@ public class VCEvent {
     }
 
     private Object box; // potrà essere o una stringa o un array di celle, o un array di carte, o la board
-    private Event event;
+    private Event command;
 
     public VCEvent(Object arg, Event command)
     {
         this.box = arg;
-        this.event = command;
+        this.command = command;
 
     }
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setCommand(Event event) {
+        this.command = event;
     }
 
-    public Event getEvent() {
-        return event;
+    public Event getCommand() {
+        return command;
     }
 
     public void setBox(Object box) {
