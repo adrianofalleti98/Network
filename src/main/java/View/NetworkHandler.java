@@ -12,7 +12,6 @@ import java.io.IOException;
 public class NetworkHandler implements Runnable, ServerObserver {
 
     private VCEvent fromServer;
-    private VCEvent toServer;
    private ServerAdapter adapter;
    private Socket server;
 
@@ -34,8 +33,10 @@ public class NetworkHandler implements Runnable, ServerObserver {
             return;
         }
         System.out.println("Connected");
-
-         adapter = new ServerAdapter(server);
+        /*qua creo un'istanza della View chiamando il suo costruttore e passandogli questo network handler
+        in modo tale da poi permetterci di chiamare i metodi della View sotto che dovranno gestire l'input e l'output
+        */
+        adapter = new ServerAdapter(server);
         adapter.addObserver(this);
         Thread thread = new Thread(adapter);
         thread.start();
@@ -52,27 +53,39 @@ public class NetworkHandler implements Runnable, ServerObserver {
 
                 }
                 //qui l'evento dal server sarà arrivato e ora devo gestirlo con una switch sul suo comando per chiamare il metodo
-                //della view, Poi la view setterà l'evento da mandare al server e chiamerà il metodo per mandarglielo
+                //della view corrispondente. Poi la view chiamerà il metodo sendVCEvent passandogli il VCEvent da mandare al Server
+
+                //UNA SOLUZIONE ALTERNATIVA POTREBBE ESSERE ANCHE MANDARE DIRETTAMENTE L'EVENTO ALLA VIEW, MA DIPENDE
+                //DA COME ALFREDO VUOLE IMPLEMENTARE LA CLI/GUI
                 VCEvent.Event command = fromServer.getCommand();
                 switch (command)
                 {
                     case setup_request:
+                        //chiamo metodo della view
                         break;
                     case username_request:
+                        //chiamo metodo della view
                         break;
                     case not_your_turn:
+                        //chiamo metodo della view
                         break;
                     case update:
+                        //chiamo metodo della view
                         break;
                     case send_cells_move:
+                        //chiamo metodo della view
                         break;
                     case send_cells_build:
+                        //chiamo metodo della view
                         break;
                     case you_lost:
+                        //chiamo metodo della view
                         break;
                     case send_all_cards:
+                        //chiamo metodo della view
                         break;
                     case send_chosen_cards:
+                        //chiamo metodo della view
                         break;
                     default:
                         return;
@@ -90,6 +103,7 @@ public class NetworkHandler implements Runnable, ServerObserver {
         notifyAll();
     }
 
+    //questo metodo verrà chiamato dalla VIEW
     public void sendVCEvent(VCEvent eventToServer)
     {
         try {
