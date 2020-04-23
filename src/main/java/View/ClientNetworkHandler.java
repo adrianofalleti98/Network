@@ -1,25 +1,26 @@
 package View;
 
 import Controller.VCEvent;
-import sun.nio.ch.Net;
+
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import java.io.IOException;
+import java.util.Scanner;
 
 
-public class NetworkHandler implements Runnable, ServerObserver {
+public class ClientNetworkHandler implements Runnable, ServerObserver {
 
     private VCEvent fromServer;
-   private ServerAdapter adapter;
-   private Socket server;
+    private ServerAdapter adapter;
+    private Socket server;
 
     public static void main( String[] args )
     {
         /* Instantiate a new Client which will also receive events from
          * the server by implementing the ServerObserver interface */
-        NetworkHandler client = new NetworkHandler();
+        ClientNetworkHandler client = new ClientNetworkHandler();
         client.run();
     }
 
@@ -57,40 +58,12 @@ public class NetworkHandler implements Runnable, ServerObserver {
 
                 //UNA SOLUZIONE ALTERNATIVA POTREBBE ESSERE ANCHE MANDARE DIRETTAMENTE L'EVENTO ALLA VIEW, MA DIPENDE
                 //DA COME ALFREDO VUOLE IMPLEMENTARE LA CLI/GUI
-                VCEvent.Event command = fromServer.getCommand();
-                switch (command)
-                {
-                    case setup_request:
-                        //chiamo metodo della view
-                        break;
-                    case username_request:
-                        //chiamo metodo della view
-                        break;
-                    case not_your_turn:
-                        //chiamo metodo della view
-                        break;
-                    case update:
-                        //chiamo metodo della view
-                        break;
-                    case send_cells_move:
-                        //chiamo metodo della view
-                        break;
-                    case send_cells_build:
-                        //chiamo metodo della view
-                        break;
-                    case you_lost:
-                        //chiamo metodo della view
-                        break;
-                    case send_all_cards:
-                        //chiamo metodo della view
-                        break;
-                    case send_chosen_cards:
-                        //chiamo metodo della view
-                        break;
-                    default:
-                        return;
-                }
-
+                System.out.println((String)fromServer.getBox());
+                VCEvent e = new VCEvent(null,null);
+                Scanner sc = new Scanner(System.in);
+                String comando = sc.nextLine();
+                e.setBox(comando);
+                sendVCEvent(e);
 
             }
         }

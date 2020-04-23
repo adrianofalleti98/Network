@@ -42,16 +42,16 @@ public class ServerAdapter implements Runnable {
         try {
             output = new ObjectOutputStream(server.getOutputStream());
             input = new ObjectInputStream(server.getInputStream());
-            handleServerConnection();
+           handleServerConnection();
+
         } catch (IOException e) {
             System.out.println("server has died");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        }
+        catch(ClassNotFoundException e)
+        {
+            System.out.println("Eccezione di classe");
         }
 
-        try {
-            server.close();
-        } catch (IOException e) { }
     }
 
     private synchronized void handleServerConnection() throws IOException, ClassNotFoundException
@@ -60,13 +60,24 @@ public class ServerAdapter implements Runnable {
         synchronized (observers) {
             observersCpy = new ArrayList<ServerObserver>(observers);
         }
-
+        VCEvent evento = null;
             while (true)
             {
-                VCEvent evento = (VCEvent) input.readObject();
-                if (evento != null)
-                    for (ServerObserver observer : observersCpy)
-                        observer.didReceiveVCEvent(evento);
+
+                try {
+
+                        evento = (VCEvent) input.readObject();
+                        System.out.println(evento.getCommand());
+                        for (ServerObserver observer : observersCpy)
+                            observer.didReceiveVCEvent(evento);
+
+
+                }
+                catch(IOException e)
+                {
+
+                }
+
             }
 
 

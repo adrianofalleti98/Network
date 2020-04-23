@@ -1,6 +1,14 @@
 package Controller;
 
-public class VCEvent {
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class VCEvent implements Serializable {
+
+    private static final long serialVersionUID = 382104422531955291L;
+
     public enum Event{
         setup_request,
         username_request,
@@ -16,6 +24,7 @@ public class VCEvent {
 
     private Object box; // potrà essere o una stringa o un array di celle, o un array di carte, o la board
     private Event command;
+
 
     public VCEvent(Object arg, Event command)
     {
@@ -39,5 +48,14 @@ public class VCEvent {
         return box;
     }
 
+    public void readObject(ObjectInputStream stream) throws IOException,ClassNotFoundException
+    {
+       stream.defaultReadObject();
+    }
+
+    public void writeObject(ObjectOutputStream stream) throws IOException
+    {
+        stream.defaultWriteObject();
+    }
 
 }
