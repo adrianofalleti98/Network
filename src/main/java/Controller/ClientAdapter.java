@@ -1,10 +1,12 @@
 package Controller;
 import View.ServerObserver;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -15,7 +17,6 @@ public class ClientAdapter implements Runnable {
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private List<ClientObserver> observers = new ArrayList<ClientObserver>();
-    private VCEvent eventFromClient;
     private int number;//from 0 to 2 maximum in case there are 3 players
 
 
@@ -41,14 +42,27 @@ public class ClientAdapter implements Runnable {
         }
     }
 
+    public void setInput(ObjectInputStream input) {
+        this.input = input;
+    }
 
+    public void setOutput(ObjectOutputStream output) {
+        this.output = output;
+    }
 
     public void run() {
         try {
-            output = new ObjectOutputStream(client.getOutputStream());
-            input = new ObjectInputStream(client.getInputStream());
-        } catch (IOException e) {
-            System.out.println("server has died");
+
+            handleClientConnection();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            System.out.println("Client has died(number "+ number);
+        }
+        catch (ClassNotFoundException e)
+        {
+
         }
         try {
             client.close();
@@ -56,18 +70,32 @@ public class ClientAdapter implements Runnable {
 
     }
 
-    public synchronized void handleClientConnection() throws IOException,ClassNotFoundException
+    public synchronized void handleClientConnection() throws IOException, ClassNotFoundException
     {
         List<ClientObserver> observersCpy;
         synchronized (observers) {
             observersCpy = new ArrayList<ClientObserver>(observers);
         }
+
         while (true)
         {
+
             VCEvent evento = (VCEvent) input.readObject();
+
             if (evento != null)
-                for (ClientObserver observer : observersCpy)
-                    observer.didReceiveVCEventFrom(evento,this.number);
+            {
+
+                if (evento.getCommand() != VCEvent.Event.ping) {
+                    for (ClientObserver observer : observersCpy)
+                        observer.didReceiveVCEventFrom(evento, this.number);
+                } else {
+                    for (ClientObserver observer : observersCpy)
+                        observer.didReceivePingFrom((Integer) evento.getBox(), this.number);
+                }
+            }
+
+
+
         }
     }
 }

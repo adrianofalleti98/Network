@@ -18,7 +18,8 @@ public class VCEvent implements Serializable {
         send_cells_build,
         you_lost,
         send_all_cards,
-        send_chosen_cards
+        send_chosen_cards,
+        ping
 
     }
 
@@ -48,12 +49,12 @@ public class VCEvent implements Serializable {
         return box;
     }
 
-    public void readObject(ObjectInputStream stream) throws IOException,ClassNotFoundException
+    public synchronized void readObject(ObjectInputStream stream) throws IOException,ClassNotFoundException
     {
-       stream.defaultReadObject();
+      stream.defaultReadObject();
     }
 
-    public void writeObject(ObjectOutputStream stream) throws IOException
+    public synchronized void writeObject(ObjectOutputStream stream) throws IOException
     {
         stream.defaultWriteObject();
     }

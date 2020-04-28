@@ -35,19 +35,23 @@ public class ServerAdapter implements Runnable {
         this.server = server;
     }
 
+    public void setOutput(ObjectOutputStream output) {
+        this.output = output;
+    }
 
+    public void setInput(ObjectInputStream input) {
+        this.input = input;
+    }
 
     public void run()
     {
         try {
-            output = new ObjectOutputStream(server.getOutputStream());
-            input = new ObjectInputStream(server.getInputStream());
            handleServerConnection();
-
-        } catch (IOException e) {
-            System.out.println("server has died");
         }
-        catch(ClassNotFoundException e)
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("server has died in the adapter");
+        } catch(ClassNotFoundException e)
         {
             System.out.println("Eccezione di classe");
         }
@@ -60,25 +64,32 @@ public class ServerAdapter implements Runnable {
         synchronized (observers) {
             observersCpy = new ArrayList<ServerObserver>(observers);
         }
-        VCEvent evento = null;
-            while (true)
+
+
+        while (true)
+        {
+            VCEvent evento = (VCEvent) input.readObject();
+
+            if (evento  != null)
             {
-
-                try {
-
-                        evento = (VCEvent) input.readObject();
-                        System.out.println(evento.getCommand());
-                        for (ServerObserver observer : observersCpy)
-                            observer.didReceiveVCEvent(evento);
-
-
-                }
-                catch(IOException e)
+                        //System.out.println("Il comando è "+ evento.getCommand() + "mentre il box è  "+ evento.getBox());
+                if (evento.getCommand() != Event.ping)
                 {
-
+                    for (ServerObserver observer : observersCpy)
+                        observer.didReceiveVCEvent(evento);
                 }
-
+                else
+                {
+                    for (ServerObserver observer : observersCpy)
+                    {
+                        //System.out.println("Ho ricevuto un ping, ora chiamo didReceivePing... " + evento.getBox());
+                        observer.didReceivePing((Integer) evento.getBox());
+                    }
+                }
             }
+
+
+        }
 
 
 
